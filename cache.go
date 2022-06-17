@@ -29,10 +29,8 @@ func NewCache() Cache {
 }
 
 func (c *Cache) Get(key string) (string, bool) {
-	for k, r := range c.Record {
-		if k == key && !r.expire() {
-			return r.value, true
-		}
+	if r, ok := c.Record[key]; ok && !r.expire() {
+		return r.value, true
 	}
 	return "", false
 }
@@ -42,18 +40,15 @@ func (c *Cache) Put(key, value string) {
 }
 
 func (c *Cache) Keys() []string {
-	rs := []string{}
+	ks := []string{}
 	for k, r := range c.Record {
-		r.expire()
 		if !r.expire() {
-			rs = append(rs, k)
+			ks = append(ks, k)
 		}
 	}
-	return rs
+	return ks
 }
 
 func (c *Cache) PutTill(key, value string, deadline time.Time) {
-	r := record{value: value, isExpired: false, expireTime: deadline}
-	r.expire()
-	c.Record[key] = r
+	c.Record[key] = record{value: value, isExpired: false, expireTime: deadline}
 }
