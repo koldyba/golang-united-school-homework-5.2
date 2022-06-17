@@ -3,7 +3,6 @@ package cache
 import "time"
 
 type record struct {
-	key        string
 	value      string
 	isExpired  bool
 	expireTime time.Time
@@ -16,7 +15,7 @@ func (r *record) expire() bool {
 }
 
 type Cache struct {
-	Record []record
+	Record map[string]record
 }
 
 func NewCache() Cache {
@@ -24,8 +23,8 @@ func NewCache() Cache {
 }
 
 func (c *Cache) Get(key string) (string, bool) {
-	for _, r := range c.Record {
-		if r.key == key && !r.expire() {
+	for k, r := range c.Record {
+		if k == key && !r.expire() {
 			return r.value, true
 		}
 	}
@@ -33,23 +32,23 @@ func (c *Cache) Get(key string) (string, bool) {
 }
 
 func (c *Cache) Put(key, value string) {
-	r := record{key: key, value: value, isExpired: false, expireTime: time.Time{}}
-	c.Record = append(c.Record, r)
+	r := record{value: value, isExpired: false, expireTime: time.Time{}}
+	c.Record[key] = r
 }
 
 func (c *Cache) Keys() []string {
 	rs := []string{}
-	for _, r := range c.Record {
+	for k, r := range c.Record {
 		r.expire()
 		if !r.expire() {
-			rs = append(rs, r.key)
+			rs = append(rs, k)
 		}
 	}
 	return rs
 }
 
 func (c *Cache) PutTill(key, value string, deadline time.Time) {
-	r := record{key: key, value: value, isExpired: false, expireTime: deadline}
+	r := record{value: value, isExpired: false, expireTime: deadline}
 	r.expire()
-	c.Record = append(c.Record, r)
+	c.Record[key] = r
 }
