@@ -11,6 +11,9 @@ type record struct {
 }
 
 func (r *record) expire() bool {
+	if r.expireTime.IsZero() {
+		return false
+	}
 	t := time.Now()
 	r.isExpired = t.After(r.expireTime)
 	return r.isExpired
@@ -35,8 +38,7 @@ func (c *Cache) Get(key string) (string, bool) {
 }
 
 func (c *Cache) Put(key, value string) {
-	r := record{value: value, isExpired: false, expireTime: time.Time{}}
-	c.Record[key] = r
+	c.Record[key] = record{value: value, isExpired: false, expireTime: time.Time{}}
 }
 
 func (c *Cache) Keys() []string {
