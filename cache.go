@@ -9,10 +9,10 @@ type record struct {
 	expireTime time.Time
 }
 
-func (r *record) expire() (ie bool) {
+func (r *record) expire() bool {
 	t := time.Now()
 	r.isExpired = t.After(r.expireTime)
-	return
+	return r.isExpired
 }
 
 type Cache struct {
