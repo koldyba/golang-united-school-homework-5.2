@@ -1,6 +1,8 @@
 package cache
 
-import "time"
+import (
+	"time"
+)
 
 type record struct {
 	value      string
@@ -19,7 +21,8 @@ type Cache struct {
 }
 
 func NewCache() Cache {
-	return Cache{}
+	rs := make(map[string]record)
+	return Cache{rs}
 }
 
 func (c *Cache) Get(key string) (string, bool) {
